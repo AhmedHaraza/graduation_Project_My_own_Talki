@@ -53,10 +53,7 @@ class _MainGroupChatScreenState extends State<MainGroupChatScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    child: const ChatBox(),
-                    width: 315.w,
-                  ),
+                  
                 ],
               ),
               Visibility(

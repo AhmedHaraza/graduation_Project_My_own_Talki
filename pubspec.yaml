@@ -48,7 +48,7 @@ dependencies:
   file_picker: ^5.2.5
   emoji_picker_flutter: ^1.5.2
   permission_handler: ^10.2.0
-  social_media_recorder: ^0.1.85 
+  social_media_recorder: ^0.1.86 
   firebase_storage: ^11.0.14
   firebase_messaging: ^14.2.5
   awesome_dialog: ^3.0.2
