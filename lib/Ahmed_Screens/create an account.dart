@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,8 +13,6 @@ import 'package:graduation_project_my_own_talki/Ahmed_Screens/my_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 class create_an_account extends StatefulWidget {
@@ -35,47 +34,29 @@ class _create_an_accountState extends State<create_an_account> {
   TextEditingController userSignUpConfirmPassword = new TextEditingController();
   TextEditingController userFirstName = new TextEditingController();
   TextEditingController userLastName = new TextEditingController();
+  TextEditingController userPhoneNumber = new TextEditingController();
   TextEditingController userBirthDate = new TextEditingController();
 
-  // Google Sign in
-  Future<UserCredential> signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
-  }
-  // End of Google Sign in
-
-  // FaceBook Sign in
-  Future<UserCredential> signInWithFacebook() async {
-    // Trigger the sign-in flow
-    final LoginResult loginResult = await FacebookAuth.instance.login();
-
-    // Create a credential from the access token
-    final OAuthCredential facebookAuthCredential =
-        FacebookAuthProvider.credential(loginResult.accessToken!.token);
-
-    // Once signed in, return the UserCredential
-    return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
-  }
-// End of FaceBook Sign in
-
-  signUp() async {
+  signUpAddUser() async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
+      UserCredential? userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-              email: userSignUpEmail.text, password: userSignUpPassword.text);
+              email: userSignUpEmail.text, password: userSignUpPassword.text)
+          .then((value) async {
+        var user = FirebaseAuth.instance.currentUser;
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user?.uid)
+            .set({
+          'First Name': userFirstName.text,
+          'Last Name': userLastName.text,
+          'Email' : userSignUpEmail.text,
+          'Password' : userSignUpPassword.text,
+          'Phone Number': userPhoneNumber.text,
+          'Birth Date': userBirthDate.text,
+        });
+      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         AwesomeDialog(
@@ -370,25 +351,31 @@ class _create_an_accountState extends State<create_an_account> {
                       ),
                     ),
                     Container(
-                      margin: REdgeInsets.only(top: 10,left: 20,right: 20),
+                      margin: REdgeInsets.only(top: 10, left: 20, right: 20),
                       child: IntlPhoneField(
+                        controller: userPhoneNumber,
                         disableLengthCheck: true,
                         dropdownIcon: Icon(
                           Icons.arrow_drop_down,
                           size: 25.sp,
                         ),
                         decoration: InputDecoration(
-                            filled: true,
-                            fillColor:  MyThemeData.colorgray,
-                            hintText: 'Phone Number',
-                            hintStyle: TextStyle(
-                              fontSize: 14.sp,
-                              color: Color.fromRGBO(95, 90, 90, 1.0),
-                              fontWeight: FontWeight.bold,
-                            ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.r)),
-                            contentPadding: REdgeInsets.all(16)),
+                          filled: true,
+                          fillColor: MyThemeData.colorgray,
+                          hintText: 'Phone Number',
+                          hintStyle: TextStyle(
+                            fontSize: 14.sp,
+                            color: Color.fromRGBO(95, 90, 90, 1.0),
+                            fontWeight: FontWeight.bold,
+                          ),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.r)),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.r)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.r)),
+                          contentPadding: REdgeInsets.all(16),
+                        ),
                         keyboardType: TextInputType.phone,
                         style: TextStyle(color: Colors.white, fontSize: 14.sp),
                       ),
@@ -396,15 +383,48 @@ class _create_an_accountState extends State<create_an_account> {
                     SizedBox(height: 10.h),
                     Padding(
                       padding: REdgeInsets.only(left: 20, right: 20),
-                      child: MyForme(
-                        'Birthdate dd / mm / yy',
-                        TextInputType.datetime,
-                        icon: const Icon(
-                          Icons.calendar_today,
-                          size: 20,
-                          color: Color.fromRGBO(95, 90, 90, 1.0),
-                        ),
-                        fieldController: userBirthDate,
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == '') {
+                            return 'This Value is Required';
+                          } else {
+                            return null;
+                          }
+                        },
+                        controller: userBirthDate,
+                        style: TextStyle(
+                            color: const Color.fromRGBO(95, 90, 90, 1.0),
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500),
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(10),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.r),
+                                borderSide: BorderSide(
+                                    color: MyThemeData.colorgray, width: 3.w)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.r),
+                                borderSide: BorderSide(
+                                    color: MyThemeData.colorgray, width: 3.w)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.r),
+                                borderSide: BorderSide(
+                                    color: MyThemeData.colorgray, width: 3.w)),
+                            hintText: "Birthdate dd / mm / yy",
+                            hintStyle: TextStyle(
+                              color: MyThemeData.filetextfiled,
+                              fontSize: 12.sp,
+                              fontWeight: MyThemeData.fontWeight.fontWeight,
+                            ),
+                            hintMaxLines: 2,
+                            filled: true,
+                            fillColor: MyThemeData.colorgray,
+                            prefixIcon: Icon(
+                              Icons.calendar_today,
+                              size: 20,
+                              color: Color.fromRGBO(95, 90, 90, 1.0),
+                            )),
+                        keyboardType: TextInputType.datetime,
                       ),
                     ),
                     SizedBox(height: 10.h),
@@ -475,7 +495,7 @@ class _create_an_accountState extends State<create_an_account> {
                             child: InkWell(
                                 onTap: () async {
                                   if (_formState.currentState!.validate()) {
-                                    await signUp();
+                                    await signUpAddUser();
                                     CircleAvatar_go_to_sin_in(context);
                                   } else {}
                                 },

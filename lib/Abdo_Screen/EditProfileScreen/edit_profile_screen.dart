@@ -237,11 +237,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       keyboardType: TextInputType.name,
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 14.sp),
-                                    )
-                                    ),
+                                    )),
                                 Container(
-                                  margin: REdgeInsets.only(top: 15),
-                                  child: TextFormField(
+                                    margin: REdgeInsets.only(top: 15),
+                                    child: TextFormField(
                                       maxLength: 10,
                                       validator: (value) => (value == '')
                                           ? 'This Value is Required'
@@ -269,12 +268,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       keyboardType: TextInputType.name,
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 14.sp),
-                                    )
-                                ),
+                                    )),
                                 Container(
                                   margin: REdgeInsets.only(top: 15),
                                   child: DataField(
-                                    'Address',
+                                    'Country',
                                     TextInputType.streetAddress,
                                     fieldController: address,
                                   ),
