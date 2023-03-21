@@ -265,14 +265,6 @@ class _Sign_InState extends State<Sign_In> {
                             SizedBox(
                               width: 17.w,
                             ),
-                            const Center(
-                              child: Image(
-                                  image: AssetImage(
-                                      'assets/image/foundation_social-apple.png')),
-                            ),
-                            SizedBox(
-                              width: 17.w,
-                            ),
                             Center(
                                 child: InkWell(
                               onTap: () async {
