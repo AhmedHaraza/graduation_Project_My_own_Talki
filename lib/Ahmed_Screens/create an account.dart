@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/CircleAvatar/CircleAvatar.dart';
@@ -21,7 +22,7 @@ class create_an_account extends StatefulWidget {
   @override
   State<create_an_account> createState() => _create_an_accountState();
 }
-
+var downloadLink;
 class _create_an_accountState extends State<create_an_account> {
   bool _visState1 = true;
   bool _visState2 = true;
@@ -44,7 +45,7 @@ class _create_an_accountState extends State<create_an_account> {
               email: userSignUpEmail.text, password: userSignUpPassword.text)
           .then((value) async {
         var user = FirebaseAuth.instance.currentUser;
-
+        await user?.updateDisplayName('${userFirstName.text} ${userLastName.text}');
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user?.uid)
@@ -57,6 +58,14 @@ class _create_an_accountState extends State<create_an_account> {
           'Birth Date': userBirthDate.text,
         });
       });
+      if(_image != null){
+        var user = FirebaseAuth.instance.currentUser;
+        var ref = await FirebaseStorage.instance.ref();
+        var userImage = await ref.child('users').child('profilePicture/${user?.displayName} Picture');
+        await userImage.putFile(_image!);
+        String imageUrl = await userImage.getDownloadURL();
+        await user?.updatePhotoURL(imageUrl);
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         AwesomeDialog(
@@ -496,6 +505,7 @@ class _create_an_accountState extends State<create_an_account> {
                                 onTap: () async {
                                   if (_formState.currentState!.validate()) {
                                     await signUpAddUser();
+                                    await FirebaseAuth.instance.signOut();
                                     CircleAvatar_go_to_sin_in(context);
                                   } else {}
                                 },
