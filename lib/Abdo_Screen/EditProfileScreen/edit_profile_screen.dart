@@ -2,12 +2,13 @@
 
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/EditProfileScreen/custom_shape.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/EditProfileScreen/data_field.dart';
-import 'package:graduation_project_my_own_talki/Abdo_Screen/EditProfileScreen/user_info.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Navigator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -22,13 +23,53 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   TextEditingController state = TextEditingController();
-  TextEditingController FirstName = TextEditingController();
-  TextEditingController lastname = TextEditingController();
-  TextEditingController address = TextEditingController();
+  TextEditingController first_name = TextEditingController();
+  TextEditingController last_name = TextEditingController();
+  TextEditingController country = TextEditingController();
+  TextEditingController phone_number = TextEditingController();
   final _formState = GlobalKey<FormState>();
   File? _image;
   final item = ['Male', 'Female'];
   String value = 'Male';
+
+  String? firstName;
+  String? lastName;
+  String? email;
+  String? phoneNumber;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserInfo();
+  }
+
+
+  
+  getUserInfo() async{
+    var user = await FirebaseAuth.instance.currentUser;
+    await  FirebaseFirestore.instance.collection('users').doc(user?.uid).get().then((value) {
+      setState(() {
+        firstName = value['First Name'];
+        lastName = value['Last Name'];
+        email = value['Email'];
+        phoneNumber = value['Phone Number'];
+      });
+    });
+  }
+
+
+  updateUserInfo() async{
+    var user = await FirebaseAuth.instance.currentUser;
+    await FirebaseFirestore.instance.collection('users').doc(user?.uid).update({
+      'First Name' : first_name.text,
+      'Last Name' : last_name.text,
+      'Country' : country.text,
+      'Phone Number' : phone_number.text,
+      'State' : state.text,
+      'Gender' : value
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -164,7 +205,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Padding(
                           padding: REdgeInsets.only(top: 3),
                           child: Text(
-                            userName,
+                            (firstName == 'null' && lastName == 'null') || (firstName == null && lastName == null)? '' : '$firstName $lastName',
                             style: TextStyle(
                               fontSize: 24.sp,
                               color: Colors.white,
@@ -175,7 +216,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Padding(
                           padding: REdgeInsets.all(5.0),
                           child: Text(
-                            userEmail,
+                            email == 'null' || email == null? '' :  email.toString(),
                             style: TextStyle(
                               fontSize: 16.sp,
                               color: Colors.white,
@@ -183,7 +224,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ),
                         Text(
-                          userPhoneNumber,
+                          phoneNumber == 'null' || phoneNumber == null? '' : phoneNumber.toString(),
                           style: TextStyle(
                             fontSize: 16.sp,
                             color: Colors.white,
@@ -210,6 +251,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 Container(
                                     margin: REdgeInsets.only(top: 15),
                                     child: TextFormField(
+                                      controller: first_name,
                                       maxLength: 10,
                                       validator: (value) => (value == '')
                                           ? 'This Value is Required'
@@ -241,6 +283,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 Container(
                                     margin: REdgeInsets.only(top: 15),
                                     child: TextFormField(
+                                      controller: last_name,
                                       maxLength: 10,
                                       validator: (value) => (value == '')
                                           ? 'This Value is Required'
@@ -274,13 +317,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   child: DataField(
                                     'Country',
                                     TextInputType.streetAddress,
-                                    fieldController: address,
+                                    fieldController: country,
                                   ),
                                 ),
                                 Container(
                                   margin: REdgeInsets.only(top: 15),
                                   height: 65.h,
                                   child: IntlPhoneField(
+                                    controller: phone_number,
                                     disableLengthCheck: true,
                                     dropdownIcon: Icon(
                                       Icons.arrow_drop_down,
@@ -364,8 +408,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   width: 237.w,
                                   height: 50.h,
                                   child: ElevatedButton(
-                                    onPressed: () {
+                                    onPressed: () async{
                                       if (_formState.currentState!.validate()) {
+                                        await updateUserInfo();
                                         Backandsubmitineditprofile(context);
                                       } else {}
                                     },
