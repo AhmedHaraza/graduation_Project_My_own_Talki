@@ -22,11 +22,13 @@ class create_an_account extends StatefulWidget {
   @override
   State<create_an_account> createState() => _create_an_accountState();
 }
-var downloadLink;
+
+// var downloadLink;
 class _create_an_accountState extends State<create_an_account> {
   bool _visState1 = true;
   bool _visState2 = true;
   File? _image;
+  var userPhoto;
 
   final _formState = GlobalKey<FormState>();
 
@@ -45,27 +47,34 @@ class _create_an_accountState extends State<create_an_account> {
               email: userSignUpEmail.text, password: userSignUpPassword.text)
           .then((value) async {
         var user = FirebaseAuth.instance.currentUser;
-        await user?.updateDisplayName('${userFirstName.text} ${userLastName.text}');
+        await user
+            ?.updateDisplayName('${userFirstName.text} ${userLastName.text}');
+        if (_image != null) {
+          var user = FirebaseAuth.instance.currentUser;
+          var ref = await FirebaseStorage.instance.ref();
+          var userImage = await ref
+              .child('users')
+              .child('profilePicture/${user?.displayName} Picture');
+          await userImage.putFile(_image!);
+          String imageUrl = await userImage.getDownloadURL();
+          await user?.updatePhotoURL(imageUrl);
+          setState(() {
+            userPhoto = imageUrl;
+          });
+        }
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user?.uid)
             .set({
           'First Name': userFirstName.text,
           'Last Name': userLastName.text,
-          'Email' : userSignUpEmail.text,
-          'Password' : userSignUpPassword.text,
+          'Email': userSignUpEmail.text,
+          'Password': userSignUpPassword.text,
           'Phone Number': userPhoneNumber.text,
           'Birth Date': userBirthDate.text,
+          'Photo Url': userPhoto,
         });
       });
-      if(_image != null){
-        var user = FirebaseAuth.instance.currentUser;
-        var ref = await FirebaseStorage.instance.ref();
-        var userImage = await ref.child('users').child('profilePicture/${user?.displayName} Picture');
-        await userImage.putFile(_image!);
-        String imageUrl = await userImage.getDownloadURL();
-        await user?.updatePhotoURL(imageUrl);
-      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         AwesomeDialog(

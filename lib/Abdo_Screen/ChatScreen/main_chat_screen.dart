@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:graduation_project_my_own_talki/Ahmed_Screens/Navigator.dart';
 
 import 'app_bar_content.dart';
 import 'chat_box.dart';
@@ -14,25 +15,31 @@ class MainChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          leading: appBarLeading,
-          title: appBarTitle,
-          actions: appBarActions,
-          backgroundColor: const Color(0xff1C1C1C),
-        ),
-        body: ListView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        ),
-        bottomNavigationBar: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
+      child: WillPopScope(
+        onWillPop: () async{
+          Backandsubmitineditprofile(context);
+          return true;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            leading: appBarLeading,
+            title: appBarTitle,
+            actions: appBarActions,
+            backgroundColor: const Color(0xff1C1C1C),
           ),
-          child: Container(
-            width: double.infinity,
-            color: const Color(0xff1C1C1C),
-            margin: const EdgeInsets.all(10),
-            child: const ChatBox(),
+          body: ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          ),
+          bottomNavigationBar: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Container(
+              width: double.infinity,
+              color: const Color(0xff1C1C1C),
+              margin: const EdgeInsets.all(10),
+              child: const ChatBox(),
+            ),
           ),
         ),
       ),
