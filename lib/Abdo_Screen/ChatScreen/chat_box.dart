@@ -41,10 +41,11 @@ class ChatBox extends StatelessWidget {
               IconButton(
                 constraints: const BoxConstraints(),
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: ((context) => mediaSelection(MediaQuery.of(context).size.width)),
-                  );
+                   showDialog(
+                      context: context,
+                      builder: ((context) =>
+                          media_select(MediaQuery.of(context).size.width)),
+                    );
                 },
                 icon: const Icon(
                   Icons.add_circle,
