@@ -220,4 +220,11 @@ void pageGroupSettings(BuildContext ctx) {
   ));
 }
 
+void chatRoom(BuildContext ctx) {
+  Navigator.of(ctx).pushReplacement(MaterialPageRoute(builder: (_) {
+    return  MainChatScreen();
+  }
+  ));
+}
+
 
