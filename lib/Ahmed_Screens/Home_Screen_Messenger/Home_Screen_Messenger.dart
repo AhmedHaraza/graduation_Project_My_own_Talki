@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/main_chat_screen.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/SideMenu/side_menu.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/CircleAvatar/CircleAvatar_add.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Home_Screen_Messenger/boutonnavigationbar.dart';
@@ -19,26 +20,6 @@ class Home_Screen_Messenger extends StatefulWidget {
 }
 
 class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
-  var userList = [];
-
-  getAllUsers() async {
-    var user = FirebaseAuth.instance.currentUser;
-    await FirebaseFirestore.instance
-        .collection('users')
-        .snapshots()
-        .listen((event) {
-      setState(() {
-        userList = event.docs;
-      });
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getAllUsers();
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -54,26 +35,109 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
             Padding(
               padding: REdgeInsets.only(top: 50, left: 20),
               child: Text(
-                "Pinned Message",
+                " Your friends",
                 style: MyThemeData.Addfriends,
               ),
             ),
             SizedBox(
-              height: 10.h,
+              height: 15.h,
             ),
             Padding(
               padding: REdgeInsets.only(left: 20),
-              child: Column(
-                children: [
-                  InkWell(
-                      onTap: () => addfriend(context),
-                      child: const CircleAvatar_add()),
-                  SizedBox(height: 10.h),
-                  Text(
-                    "Add",
-                    style: TextStyle(fontSize: 10.sp, color: Colors.white),
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 85.h,
+                child: Row(children: [
+                  Column(
+                    children: [
+                      InkWell(
+                          onTap: () => addfriend(context),
+                          child: const CircleAvatar_add()),
+                      SizedBox(height: 10.h),
+                      Text(
+                        "Add",
+                        style: TextStyle(fontSize: 12.sp, color: Colors.white),
+                      ),
+                    ],
                   ),
-                ],
+                  Expanded(
+                    child: Container(
+                      padding: REdgeInsets.only(right: 10, left: 10),
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: REdgeInsets.all(0),
+                        itemCount: friendList.length,
+                        itemBuilder: (context, index) {
+                          var user = FirebaseAuth.instance.currentUser;
+                          if (user?.email != friendList[index]['Email']) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: REdgeInsets.only(right: 10),
+                                  child: InkWell(
+                                    onTap: () {
+                            Navigator.of(context).pushReplacementNamed(
+                                MainChatScreen.route_MainChatScreen,
+                                arguments: {
+                                  'id': '${friendList[index]['id']}',
+                                  'First Name':
+                                      '${friendList[index]['First Name']}',
+                                  'Last Name':
+                                      '${friendList[index]['Last Name']}',
+                                  'Photo Url':
+                                      '${friendList[index]['Photo Url']}',
+                                });
+                          },
+                                    child: CircleAvatar(
+                                      radius: 20.r,
+                                      backgroundColor: Color(0xff4D5151),
+                                      backgroundImage: (friendList[index]
+                                                      ['Photo Url'] ==
+                                                  null ||
+                                              friendList[index]['Photo Url'] ==
+                                                  '')
+                                          ? null
+                                          : NetworkImage(
+                                              '${friendList[index]['Photo Url']}'),
+                                      child: (friendList[index]['Photo Url'] ==
+                                                  null ||
+                                              friendList[index]['Photo Url'] ==
+                                                  '')
+                                          ? Icon(
+                                              Icons.person,
+                                              size: 20.sp,
+                                            )
+                                          : Container(),
+                                    ),
+                                    onLongPress: () {
+                                      deletefriend(index);
+                                    },
+                                  ),
+                                ),
+                                Container(
+                                  width: 40,
+                                  child: Padding(
+                                    padding: REdgeInsets.only(top: 10),
+                                    child: Text(
+                                      '${friendList[index]['First Name']}',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12.sp),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ]),
               ),
             ),
             SizedBox(
@@ -92,54 +156,68 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
                 style: MyThemeData.Addfriends,
               ),
             ),
-            Expanded(
-              child: Container(
-                child: ListView.builder(
-                  itemCount: userList.length,
-                  itemBuilder: (context, index) {
-                    var user = FirebaseAuth.instance.currentUser;
-                    if (user?.email != userList[index]['Email']) {
-                      return ListTile(
-                        onTap: () {
-                          chatRoom(context);
-                        },
-                        leading: CircleAvatar(
-                          radius: 25.r,
-                          backgroundColor: Color(0xff4D5151),
-                          backgroundImage: (userList[index]['Photo Url'] ==
-                                      null ||
-                                  userList[index]['Photo Url'] == '')
-                              ? null
-                              : NetworkImage('${userList[index]['Photo Url']}'),
-                          child: (userList[index]['Photo Url'] == null ||
-                                  userList[index]['Photo Url'] == '')
-                              ? Icon(
-                                  Icons.person,
-                                  size: 30.sp,
-                                )
-                              : Container(),
-                        ),
-                        title: Text(
-                          '${userList[index]['First Name']}',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        subtitle: Text(
-                          'Hello there!',
-                          style: TextStyle(color: const Color.fromRGBO(255, 75, 38, 1.0)),
-                        ),
-                      );
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
+  }
+  var friendList = [];
+
+  getAllFriends() async {
+    var user = FirebaseAuth.instance.currentUser;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .collection('Friends')
+        .snapshots()
+        .listen((event) {
+      setState(() {
+        friendList = event.docs;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAllFriends();
+  }
+
+  deletefriend(Index) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              backgroundColor: Color(0xff161616),
+              title: Text(
+                'Are You Sure You Want To Delete This Friend  ?',
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  color: Colors.white,
+                ),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Color.fromRGBO(255, 75, 38, 1.0)),
+                    )),
+                TextButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    var user = await FirebaseAuth.instance.currentUser;
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user?.uid)
+                        .collection('Friends')
+                        .doc('${friendList[Index]['id']}')
+                        .delete();
+                  },
+                  child: Text('Yes',
+                      style:
+                          TextStyle(color: Color.fromRGBO(255, 75, 38, 1.0))),
+                ),
+              ],
+            ));
   }
 }

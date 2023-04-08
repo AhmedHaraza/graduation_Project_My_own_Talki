@@ -106,7 +106,9 @@ class _Sign_InState extends State<Sign_In> {
     var user = FirebaseAuth.instance.currentUser;
 
     await FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
+      'id' : user?.uid,
       'First Name' : user?.displayName,
+      'Last Name' : '',
       'Email' : user?.email,
       'phone Number' : user?.phoneNumber,
       'Photo Url' : user?.photoURL,
@@ -118,7 +120,9 @@ class _Sign_InState extends State<Sign_In> {
     var user = FirebaseAuth.instance.currentUser;
 
     await FirebaseFirestore.instance.collection('users').doc(user?.uid).set({
+      'id' : user?.uid,
       'First Name' : user?.displayName,
+      'Last Name' : '',
       'Email' : user?.email,
       'phone Number' : user?.phoneNumber,
       'Photo Url' : user?.photoURL,

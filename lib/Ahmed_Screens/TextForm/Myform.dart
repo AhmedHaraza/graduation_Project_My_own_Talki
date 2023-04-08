@@ -231,7 +231,7 @@ class Search extends StatelessWidget {
             ),
             filled: true,
             fillColor: Colors.white,
-            hintText: "Search for contents",
+            hintText: "Search for People",
             hintStyle: TextStyle(
               color: const Color.fromRGBO(255, 75, 38, 1.0),
               fontSize: 12.sp,

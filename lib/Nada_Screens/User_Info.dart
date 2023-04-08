@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 class User_Info extends StatefulWidget {
-            static const String route_User_Info = 'User_Info';
+  static const String route_User_Info = 'User_Info';
   const User_Info({super.key});
   @override
   State<User_Info> createState() => _User_InfoState();

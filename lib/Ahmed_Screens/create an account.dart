@@ -66,6 +66,7 @@ class _create_an_accountState extends State<create_an_account> {
             .collection('users')
             .doc(user?.uid)
             .set({
+          'id' : user?.uid,
           'First Name': userFirstName.text,
           'Last Name': userLastName.text,
           'Email': userSignUpEmail.text,
@@ -538,15 +539,6 @@ class _create_an_accountState extends State<create_an_account> {
     });
     Navigator.of(context, rootNavigator: true).pop('dialog');
   }
-
-  // void pickGalaey() async {
-  //   var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-  //   setState(() {
-  //     _image = File(image!.path);
-  //     Navigator.of(context, rootNavigator: true).pop('dialog');
-  //   });
-  // }
-
   FilePickerResult? result;
   String? _fileName;
   PlatformFile? pickedfile;

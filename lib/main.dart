@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/main_chat_screen.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/GroupChatScreen/main_group_chat_screen.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Home_Screen_Messenger/Main_Navigation.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/my_theme.dart';
@@ -42,6 +43,7 @@ class Home_page extends StatelessWidget {
                 //MainGroupChatScreen.route_MainGroupChatScreen,
                 MyHomepage.route_MyHomepage,
             routes: {
+              MainChatScreen.route_MainChatScreen:(c)=>MainChatScreen(),
               MainGroupChatScreen.route_MainGroupChatScreen: (c) =>
                   MainGroupChatScreen(),
               MyHomepage.route_MyHomepage: (c) => MyHomepage(),

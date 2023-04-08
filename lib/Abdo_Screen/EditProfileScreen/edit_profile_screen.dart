@@ -12,6 +12,7 @@ import 'package:graduation_project_my_own_talki/Abdo_Screen/EditProfileScreen/da
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Navigator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class EditProfileScreen extends StatefulWidget {
   static const String route_EditProfileScreen = 'EditProfileScreen';
@@ -43,11 +44,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     getUserInfo();
   }
 
-
-  
-  getUserInfo() async{
+  getUserInfo() async {
     var user = await FirebaseAuth.instance.currentUser;
-    await  FirebaseFirestore.instance.collection('users').doc(user?.uid).get().then((value) {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .get()
+        .then((value) {
       setState(() {
         firstName = value['First Name'];
         lastName = value['Last Name'];
@@ -57,16 +60,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
-
-  updateUserInfo() async{
+  updateUserInfo() async {
     var user = await FirebaseAuth.instance.currentUser;
     await FirebaseFirestore.instance.collection('users').doc(user?.uid).update({
-      'First Name' : first_name.text,
-      'Last Name' : last_name.text,
-      'Country' : country.text,
-      'Phone Number' : phone_number.text,
-      'State' : state.text,
-      'Gender' : value
+      'First Name': first_name.text,
+      'Last Name': last_name.text,
+      'Country': country.text,
+      'Phone Number': phone_number.text,
+      'State': state.text,
+      'Gender': value
     });
   }
 
@@ -205,7 +207,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Padding(
                           padding: REdgeInsets.only(top: 3),
                           child: Text(
-                            (firstName == 'null' && lastName == 'null') || (firstName == null && lastName == null)? '' : '$firstName $lastName',
+                            (firstName == 'null' && lastName == 'null') ||
+                                    (firstName == null && lastName == null)
+                                ? ''
+                                : '$firstName $lastName',
                             style: TextStyle(
                               fontSize: 24.sp,
                               color: Colors.white,
@@ -216,7 +221,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Padding(
                           padding: REdgeInsets.all(5.0),
                           child: Text(
-                            email == 'null' || email == null? '' :  email.toString(),
+                            email == 'null' || email == null
+                                ? ''
+                                : email.toString(),
                             style: TextStyle(
                               fontSize: 16.sp,
                               color: Colors.white,
@@ -224,7 +231,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ),
                         Text(
-                          phoneNumber == 'null' || phoneNumber == null? '' : phoneNumber.toString(),
+                          phoneNumber == 'null' || phoneNumber == null
+                              ? ''
+                              : phoneNumber.toString(),
                           style: TextStyle(
                             fontSize: 16.sp,
                             color: Colors.white,
@@ -315,7 +324,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 Container(
                                   margin: REdgeInsets.only(top: 15),
                                   child: DataField(
-                                    'Country',
+                                    'Nationality',
                                     TextInputType.streetAddress,
                                     fieldController: country,
                                   ),
@@ -408,7 +417,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   width: 237.w,
                                   height: 50.h,
                                   child: ElevatedButton(
-                                    onPressed: () async{
+                                    onPressed: () async {
                                       if (_formState.currentState!.validate()) {
                                         await updateUserInfo();
                                         Backandsubmitineditprofile(context);
@@ -494,6 +503,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() {
         isLoading = true;
       });
+      
       result = await FilePicker.platform
           .pickFiles(type: FileType.image, allowMultiple: false);
       if (result != null) {
@@ -510,11 +520,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       print(e);
     }
   }
-  // void pickGalaey() async {
-  //   var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-  //   setState(() {
-  //     _image = File(image!.path);
-  //     Navigator.of(context, rootNavigator: true).pop('dialog');
-  //   });
-  // }
 }

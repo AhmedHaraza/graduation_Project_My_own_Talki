@@ -1,12 +1,9 @@
-// ignore_for_file: non_constant_identifier_names, file_names, unused_import
-
 import 'package:flutter/material.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/main_chat_screen.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatWallPaperScreen/chatwallpaper_screen.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/ContactsScreen/contacts_screen.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/EditProfileScreen/edit_profile_screen.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/HideStatusScreen/hide_status_screen.dart';
-import 'package:graduation_project_my_own_talki/Ahmed_Screens/Home_Screen_Messenger/Home_Screen_Messenger.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Home_Screen_Messenger/Main_Navigation.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Home_Screen_Messenger/add_Friend.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Home_Screen_Messenger/contectsmessegegroup.dart';
@@ -18,6 +15,7 @@ import 'package:graduation_project_my_own_talki/Mohamed/GroupSettings.dart';
 import 'package:graduation_project_my_own_talki/Mohamed/TypeS.dart';
 import 'package:graduation_project_my_own_talki/Nada_Screens/Custom_Wallpaper.dart';
 import 'package:graduation_project_my_own_talki/Nada_Screens/Reset_Password.dart';
+import 'package:graduation_project_my_own_talki/Nada_Screens/User_Info.dart';
 import 'package:graduation_project_my_own_talki/lib/Mazen_Screens/OtpForm.dart';
 import 'package:graduation_project_my_own_talki/lib/Mazen_Screens/bright.dart';
 import 'package:graduation_project_my_own_talki/lib/Mazen_Screens/dark.dart';
@@ -220,9 +218,9 @@ void pageGroupSettings(BuildContext ctx) {
   ));
 }
 
-void chatRoom(BuildContext ctx) {
+void userInfo(BuildContext ctx) {
   Navigator.of(ctx).pushReplacement(MaterialPageRoute(builder: (_) {
-    return  MainChatScreen();
+    return  User_Info();
   }
   ));
 }

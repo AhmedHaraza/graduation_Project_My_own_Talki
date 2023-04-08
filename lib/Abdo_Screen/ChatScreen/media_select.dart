@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/contacts_list.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class media_select extends StatefulWidget {
   media_select(this.screenwidth);
@@ -97,6 +98,10 @@ class _media_selectState extends State<media_select> {
                 ),
                 child: IconButton(
                   onPressed: () async {
+                     final permission = await Permission.photos.status;
+                    if (permission != PermissionStatus.granted) {
+                      await Permission.photos.request();
+                    }
                     final result = await FilePicker.platform.pickFiles(
                       allowMultiple: true,
                       type: FileType.image,
@@ -142,9 +147,14 @@ class _media_selectState extends State<media_select> {
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => ContactListPage()));
+                  onPressed: () async {
+                    final permission = await Permission.contacts.status;
+                    if (permission != PermissionStatus.granted) {
+                      await Permission.contacts.request();
+                    } else {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => ContactListPage()));
+                    }
                   },
                   icon: const Icon(
                     Icons.contacts,
@@ -161,18 +171,33 @@ class _media_selectState extends State<media_select> {
   }
 
   void pickImage() async {
-    var image = await ImagePicker().pickImage(source: ImageSource.camera);
+    final permission = await Permission.camera.status;
+    if (permission != PermissionStatus.granted) {
+      await Permission.camera.request();
+    }
+    else{
+       var image = await ImagePicker().pickImage(source: ImageSource.camera);
     _image = File(image!.path);
     Navigator.of(context, rootNavigator: true).pop('dialog');
+    }
   }
 
   void pickGalaey() async {
-    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    _image = File(image!.path);
-    Navigator.of(context, rootNavigator: true).pop('dialog');
+    final permission = await Permission.photos.status;
+    if (permission != PermissionStatus.granted) {
+      await Permission.photos.request();
+    } else {
+      var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      _image = File(image!.path);
+      Navigator.of(context, rootNavigator: true).pop('dialog');
+    }
   }
 
   void OpenFile() async {
+     final permission = await Permission.manageExternalStorage.status;
+                    if (permission != PermissionStatus.granted) {
+                      await Permission.manageExternalStorage.request();
+                    }
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'pdf', 'doc'],

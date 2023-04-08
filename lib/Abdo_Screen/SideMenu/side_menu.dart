@@ -270,20 +270,23 @@ class _SideMenuState extends State<SideMenu> {
             ),
           ),
           //5
-          NavControllers(
-            Padding(
-              padding: const EdgeInsets.only(top: 3),
-              child: Icon(
-                Icons.lock,
-                color: Colors.white,
-                size: 16.sp,
+          Visibility(
+            visible: _Editprofilevisiblty,
+            child: NavControllers(
+              Padding(
+                padding: const EdgeInsets.only(top: 3),
+                child: Icon(
+                  Icons.lock,
+                  color: Colors.white,
+                  size: 16.sp,
+                ),
               ),
-            ),
-            'Change password',
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16.sp,
-              color: Colors.white,
+              'Change password',
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16.sp,
+                color: Colors.white,
+              ),
             ),
           ),
           //6
