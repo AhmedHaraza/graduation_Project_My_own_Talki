@@ -18,8 +18,8 @@ class MainChatScreen extends StatefulWidget {
 class _MainChatScreenState extends State<MainChatScreen> {
   @override
   Widget build(BuildContext context) {
-    Map<String, String> datauserInfo =
-        ModalRoute.of(context)?.settings.arguments as Map<String, String>;
+    Map<String, dynamic> datauserInfo =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: WillPopScope(
@@ -58,12 +58,14 @@ class _MainChatScreenState extends State<MainChatScreen> {
                   Container(
                     constraints: BoxConstraints(),
                     alignment: Alignment.centerLeft,
-                    child:  Text(
-                      '${datauserInfo['First Name']} ${datauserInfo['Last Name']} ',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    child:  FittedBox(
+                      child: Text(
+                        '${datauserInfo['First Name']} ${datauserInfo['Last Name']} ',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -81,7 +83,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
                         'Online',
                         style: TextStyle(
                           color: Color(0xffFF4B26),
-                          fontSize: 16,
+                          fontSize: 14,
                         ),
                       ),
                     ],

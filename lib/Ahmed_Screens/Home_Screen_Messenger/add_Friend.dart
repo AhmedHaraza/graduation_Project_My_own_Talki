@@ -173,7 +173,7 @@ class _AddfrindsState extends State<Addfrinds> {
       'First Name': '${userList[Index]['First Name']}',
       'Last Name': '${userList[Index]['Last Name']}',
       'Email': '${userList[Index]['Email']}',
-      'Photo Url': '${userList[Index]['Photo Url']}',
+      'Photo Url': userList[Index]['Photo Url'],
     });
   }
 }

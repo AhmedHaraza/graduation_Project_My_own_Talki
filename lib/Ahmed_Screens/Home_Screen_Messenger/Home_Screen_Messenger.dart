@@ -86,7 +86,7 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
                                   'Last Name':
                                       '${friendList[index]['Last Name']}',
                                   'Photo Url':
-                                      '${friendList[index]['Photo Url']}',
+                                      friendList[index]['Photo Url'],
                                 });
                           },
                                     child: CircleAvatar(
@@ -106,7 +106,7 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
                                                   '')
                                           ? Icon(
                                               Icons.person,
-                                              size: 20.sp,
+                                              size: 27.sp,
                                             )
                                           : Container(),
                                     ),
