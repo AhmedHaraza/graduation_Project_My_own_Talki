@@ -1,7 +1,10 @@
 // ignore_for_file: constant_identifier_names
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/message.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Navigator.dart';
 
 import 'app_bar_content.dart';
@@ -16,6 +19,23 @@ class MainChatScreen extends StatefulWidget {
 }
 
 class _MainChatScreenState extends State<MainChatScreen> {
+  var currentUserId;
+  var currentUserPhoto;
+
+  getUserInfo() async {
+    var user = await FirebaseAuth.instance.currentUser;
+    setState(() {
+      currentUserId = user?.uid;
+      currentUserPhoto = user?.photoURL;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> datauserInfo =
@@ -32,7 +52,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
             leading: Container(
               margin: const EdgeInsets.all(7),
               child: InkWell(
-                onTap:()=>userInfo(context),
+                onTap: () => userInfo(context),
                 child: CircleAvatar(
                   radius: 25.r,
                   backgroundColor: Color(0xff4D5151),
@@ -51,16 +71,16 @@ class _MainChatScreenState extends State<MainChatScreen> {
               ),
             ),
             title: InkWell(
-              onTap:()=>userInfo(context),
+              onTap: () => userInfo(context),
               // ()=> userInfo(context),
               child: Column(
                 children: [
                   Container(
                     constraints: BoxConstraints(),
                     alignment: Alignment.centerLeft,
-                    child:  FittedBox(
+                    child: FittedBox(
                       child: Text(
-                        '${datauserInfo['First Name']} ${datauserInfo['Last Name']} ',
+                        '${datauserInfo['First Name']} ${datauserInfo['Last Name']}',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -94,8 +114,78 @@ class _MainChatScreenState extends State<MainChatScreen> {
             actions: appBarActions,
             backgroundColor: const Color(0xff1C1C1C),
           ),
-          body: ListView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          body: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('users')
+                .doc(currentUserId)
+                .collection('Chats')
+                .doc(datauserInfo['id'].toString().trim())
+                .collection('Messages')
+                .orderBy('Date and Time', descending: true)
+                .snapshots(),
+            builder: (context, snapshot) => (snapshot.connectionState ==
+                    ConnectionState.waiting)
+                ? Center(
+                    child: CircularProgressIndicator(
+                    color: Color(0xffFF4B26),
+                  ))
+                : ListView.builder(
+                    reverse: true,
+                    padding: REdgeInsets.only(left: 10, right: 10),
+                    itemCount: snapshot.data?.docs.length,
+                    itemBuilder: (context, index) => (currentUserId ==
+                            snapshot.data?.docs[index]['Sender ID'])
+                        ? Row(
+                            mainAxisAlignment: (currentUserId ==
+                                    snapshot.data?.docs[index]['Sender ID'])
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
+                            children: [
+                              SenderMessage(
+                                messageContent:
+                                    '${snapshot.data?.docs[index]['Message Content']}',
+                              ),
+                              CircleAvatar(
+                                backgroundColor: Color(0xff4D5151),
+                                backgroundImage: (currentUserPhoto == null ||
+                                        currentUserPhoto == '')
+                                    ? null
+                                    : NetworkImage('${currentUserPhoto}'),
+                                child: (currentUserPhoto == null ||
+                                        currentUserPhoto == '')
+                                    ? Icon(
+                                        Icons.person,
+                                        size: 27.sp,
+                                      )
+                                    : Container(),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: Color(0xff4D5151),
+                                backgroundImage:
+                                    (datauserInfo['Photo Url'] == null ||
+                                            datauserInfo['Photo Url'] == '')
+                                        ? null
+                                        : NetworkImage(
+                                            '${datauserInfo['Photo Url']}'),
+                                child: (datauserInfo['Photo Url'] == null ||
+                                        datauserInfo['Photo Url'] == '')
+                                    ? Icon(
+                                        Icons.person,
+                                        size: 27.sp,
+                                      )
+                                    : Container(),
+                              ),
+                              ReceiverMessage(
+                                messageContent:
+                                    '${snapshot.data?.docs[index]['Message Content']}',
+                              ),
+                            ],
+                          )),
           ),
           bottomNavigationBar: Padding(
             padding: EdgeInsets.only(
@@ -105,7 +195,11 @@ class _MainChatScreenState extends State<MainChatScreen> {
               width: double.infinity,
               color: const Color(0xff1C1C1C),
               margin: const EdgeInsets.all(10),
-              child: const ChatBox(),
+              child: ChatBox(
+                recieverId: datauserInfo['id'],
+                recieverName:
+                    '${datauserInfo['First Name']} ${datauserInfo['Last Name']}',
+              ),
             ),
           ),
         ),

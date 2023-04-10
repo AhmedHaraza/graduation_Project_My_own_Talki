@@ -62,6 +62,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   updateUserInfo() async {
     var user = await FirebaseAuth.instance.currentUser;
+    await user?.updateDisplayName('${first_name.text} ${last_name.text}');
     await FirebaseFirestore.instance.collection('users').doc(user?.uid).update({
       'First Name': first_name.text,
       'Last Name': last_name.text,
@@ -261,7 +262,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     margin: REdgeInsets.only(top: 15),
                                     child: TextFormField(
                                       controller: first_name,
-                                      maxLength: 10,
+                                      maxLength: 15,
                                       validator: (value) => (value == '')
                                           ? 'This Value is Required'
                                           : null,
@@ -293,7 +294,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     margin: REdgeInsets.only(top: 15),
                                     child: TextFormField(
                                       controller: last_name,
-                                      maxLength: 10,
+                                      maxLength: 15,
                                       validator: (value) => (value == '')
                                           ? 'This Value is Required'
                                           : null,
@@ -503,7 +504,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() {
         isLoading = true;
       });
-      
+
       result = await FilePicker.platform
           .pickFiles(type: FileType.image, allowMultiple: false);
       if (result != null) {

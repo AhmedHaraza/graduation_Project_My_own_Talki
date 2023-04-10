@@ -11,6 +11,8 @@ import 'package:graduation_project_my_own_talki/Ahmed_Screens/Home_Screen_Messen
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Navigator.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/TextForm/Myform.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/my_theme.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 class Home_Screen_Messenger extends StatefulWidget {
   static const String route_Home_Messenger = 'rout_messnger';
@@ -20,6 +22,28 @@ class Home_Screen_Messenger extends StatefulWidget {
 }
 
 class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
+  bool isConnected = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getAllFriends();
+    InternetConnectionChecker().onStatusChange.listen((event) {
+      setState(() {
+        isConnected = event == InternetConnectionStatus.connected;
+      });
+      if(isConnected){}else{
+        showSimpleNotification(
+        Text(
+          'Check Your Connectivity',
+        ),
+        duration: Duration(seconds: 4),
+        background: Color.fromRGBO(255, 75, 38, 1.0),
+      );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -70,65 +94,75 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
                         itemBuilder: (context, index) {
                           var user = FirebaseAuth.instance.currentUser;
                           if (user?.email != friendList[index]['Email']) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: REdgeInsets.only(right: 10),
-                                  child: InkWell(
-                                    onTap: () {
-                            Navigator.of(context).pushReplacementNamed(
-                                MainChatScreen.route_MainChatScreen,
-                                arguments: {
-                                  'id': '${friendList[index]['id']}',
-                                  'First Name':
-                                      '${friendList[index]['First Name']}',
-                                  'Last Name':
-                                      '${friendList[index]['Last Name']}',
-                                  'Photo Url':
-                                      friendList[index]['Photo Url'],
-                                });
-                          },
-                                    child: CircleAvatar(
-                                      radius: 20.r,
-                                      backgroundColor: Color(0xff4D5151),
-                                      backgroundImage: (friendList[index]
-                                                      ['Photo Url'] ==
-                                                  null ||
-                                              friendList[index]['Photo Url'] ==
-                                                  '')
-                                          ? null
-                                          : NetworkImage(
-                                              '${friendList[index]['Photo Url']}'),
-                                      child: (friendList[index]['Photo Url'] ==
-                                                  null ||
-                                              friendList[index]['Photo Url'] ==
-                                                  '')
-                                          ? Icon(
-                                              Icons.person,
-                                              size: 27.sp,
-                                            )
-                                          : Container(),
-                                    ),
-                                    onLongPress: () {
-                                      deletefriend(index);
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  width: 40,
-                                  child: Padding(
-                                    padding: REdgeInsets.only(top: 10),
-                                    child: Text(
-                                      '${friendList[index]['First Name']}',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12.sp),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
+                            return Container(
+                              width: 52.w,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: REdgeInsets.only(right: 10),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        Navigator.of(context)
+                                            .pushReplacementNamed(
+                                                MainChatScreen
+                                                    .route_MainChatScreen,
+                                                arguments: {
+                                              'id':
+                                                  '${friendList[index]['id']}',
+                                              'First Name':
+                                                  '${friendList[index]['First Name']}',
+                                              'Last Name':
+                                                  '${friendList[index]['Last Name']}',
+                                              'Photo Url': friendList[index]
+                                                  ['Photo Url'],
+                                            });
+                                      },
+                                      child: CircleAvatar(
+                                        radius: 20.r,
+                                        backgroundColor: Color(0xff4D5151),
+                                        backgroundImage: (friendList[index]
+                                                        ['Photo Url'] ==
+                                                    null ||
+                                                friendList[index]
+                                                        ['Photo Url'] ==
+                                                    '')
+                                            ? null
+                                            : NetworkImage(
+                                                '${friendList[index]['Photo Url']}'),
+                                        child: (friendList[index]
+                                                        ['Photo Url'] ==
+                                                    null ||
+                                                friendList[index]
+                                                        ['Photo Url'] ==
+                                                    '')
+                                            ? Icon(
+                                                Icons.person,
+                                                size: 27.sp,
+                                              )
+                                            : Container(),
+                                      ),
+                                      onLongPress: () {
+                                        deletefriend(index);
+                                      },
                                     ),
                                   ),
-                                )
-                              ],
+                                  Container(
+                                    // width: 45.h,
+                                    child: Padding(
+                                      padding: REdgeInsets.only(top: 10),
+                                      child: Text(
+                                        '${friendList[index]['First Name']} ${friendList[index]['Last Name']}',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12.sp),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
                             );
                           } else {
                             return Container();
@@ -161,6 +195,7 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
       ),
     );
   }
+
   var friendList = [];
 
   getAllFriends() async {
@@ -175,12 +210,6 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
         friendList = event.docs;
       });
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getAllFriends();
   }
 
   deletefriend(Index) {
