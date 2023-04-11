@@ -152,7 +152,7 @@ class _media_selectState extends State<media_select> {
                     if (permission != PermissionStatus.granted) {
                       await Permission.contacts.request();
                     } else {
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => ContactListPage()));
                     }
                   },

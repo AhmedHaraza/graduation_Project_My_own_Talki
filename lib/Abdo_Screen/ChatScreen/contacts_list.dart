@@ -78,8 +78,7 @@ class _ContactListPageState extends State<ContactListPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (BuildContext context) => MainChatScreen()));
+        Navigator.of(context).pop();
         return true;
       },
       child: Scaffold(
