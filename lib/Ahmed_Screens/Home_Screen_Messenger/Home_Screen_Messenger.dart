@@ -21,9 +21,9 @@ class Home_Screen_Messenger extends StatefulWidget {
   State<Home_Screen_Messenger> createState() => _Home_Screen_MessengerState();
 }
 
-class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
-  bool isConnected = false;
+bool isConnected = false;
 
+class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
   @override
   void initState() {
     super.initState();
@@ -32,15 +32,6 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
       setState(() {
         isConnected = event == InternetConnectionStatus.connected;
       });
-      if(isConnected){}else{
-        showSimpleNotification(
-        Text(
-          'Check Your Connectivity',
-        ),
-        duration: Duration(seconds: 4),
-        background: Color.fromRGBO(255, 75, 38, 1.0),
-      );
-      }
     });
   }
 
@@ -53,144 +44,163 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
       child: Scaffold(
         endDrawer: SideMenu(),
         resizeToAvoidBottomInset: false,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: REdgeInsets.only(top: 50, left: 20),
-              child: Text(
-                " Your friends",
-                style: MyThemeData.Addfriends,
-              ),
-            ),
-            SizedBox(
-              height: 15.h,
-            ),
-            Padding(
-              padding: REdgeInsets.only(left: 20),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 85.h,
-                child: Row(children: [
-                  Column(
-                    children: [
-                      InkWell(
-                          onTap: () => addfriend(context),
-                          child: const CircleAvatar_add()),
-                      SizedBox(height: 10.h),
-                      Text(
-                        "Add",
-                        style: TextStyle(fontSize: 12.sp, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: REdgeInsets.only(right: 10, left: 10),
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: REdgeInsets.all(0),
-                        itemCount: friendList.length,
-                        itemBuilder: (context, index) {
-                          var user = FirebaseAuth.instance.currentUser;
-                          if (user?.email != friendList[index]['Email']) {
-                            return Container(
-                              width: 52.w,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: REdgeInsets.only(right: 10),
-                                    child: InkWell(
-                                      onTap: () async {
-                                        Navigator.of(context)
-                                            .pushReplacementNamed(
-                                                MainChatScreen
-                                                    .route_MainChatScreen,
-                                                arguments: {
-                                              'id':
-                                                  '${friendList[index]['id']}',
-                                              'First Name':
-                                                  '${friendList[index]['First Name']}',
-                                              'Last Name':
-                                                  '${friendList[index]['Last Name']}',
-                                              'Photo Url': friendList[index]
-                                                  ['Photo Url'],
-                                            });
-                                      },
-                                      child: CircleAvatar(
-                                        radius: 20.r,
-                                        backgroundColor: Color(0xff4D5151),
-                                        backgroundImage: (friendList[index]
-                                                        ['Photo Url'] ==
-                                                    null ||
-                                                friendList[index]
-                                                        ['Photo Url'] ==
-                                                    '')
-                                            ? null
-                                            : NetworkImage(
-                                                '${friendList[index]['Photo Url']}'),
-                                        child: (friendList[index]
-                                                        ['Photo Url'] ==
-                                                    null ||
-                                                friendList[index]
-                                                        ['Photo Url'] ==
-                                                    '')
-                                            ? Icon(
-                                                Icons.person,
-                                                size: 27.sp,
-                                              )
-                                            : Container(),
-                                      ),
-                                      onLongPress: () {
-                                        deletefriend(index);
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    // width: 45.h,
-                                    child: Padding(
-                                      padding: REdgeInsets.only(top: 10),
-                                      child: Text(
-                                        '${friendList[index]['First Name']} ${friendList[index]['Last Name']}',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12.sp),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            );
-                          } else {
-                            return Container();
-                          }
-                        },
-                      ),
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Visibility(
+                visible: isConnected ? false : true,
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: REdgeInsets.all(5),
+                  width: MediaQuery.of(context).size.width,
+                  color: Color.fromRGBO(255, 75, 38, 1.0),
+                  child: Text(
+                    'Check Your Connectivity',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ]),
+                ),
               ),
-            ),
-            SizedBox(
-              height: 13.h,
-            ),
-            Padding(
-                padding: REdgeInsets.only(left: 20, right: 20),
-                child: const Searchforcontents()),
-            SizedBox(
-              height: 13.h,
-            ),
-            Padding(
-              padding: REdgeInsets.only(left: 20, bottom: 15),
-              child: Text(
-                "Your Message",
-                style: MyThemeData.Addfriends,
+              Padding(
+                padding: REdgeInsets.only(top: 20, left: 20),
+                child: Text(
+                  " Your friends",
+                  style: MyThemeData.Addfriends,
+                ),
               ),
-            ),
-          ],
+              SizedBox(
+                height: 15.h,
+              ),
+              Padding(
+                padding: REdgeInsets.only(left: 20),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 85.h,
+                  child: Row(children: [
+                    Column(
+                      children: [
+                        InkWell(
+                            onTap: () => addfriend(context),
+                            child: const CircleAvatar_add()),
+                        SizedBox(height: 10.h),
+                        Text(
+                          "Add",
+                          style:
+                              TextStyle(fontSize: 12.sp, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: REdgeInsets.only(right: 10, left: 10),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: REdgeInsets.all(0),
+                          itemCount: friendList.length,
+                          itemBuilder: (context, index) {
+                            var user = FirebaseAuth.instance.currentUser;
+                            if (user?.email != friendList[index]['Email']) {
+                              return Container(
+                                width: 52.w,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: REdgeInsets.only(right: 10),
+                                      child: InkWell(
+                                        onTap: () async {
+                                          Navigator.of(context)
+                                              .pushReplacementNamed(
+                                                  MainChatScreen
+                                                      .route_MainChatScreen,
+                                                  arguments: {
+                                                'id':
+                                                    '${friendList[index]['id']}',
+                                                'First Name':
+                                                    '${friendList[index]['First Name']}',
+                                                'Last Name':
+                                                    '${friendList[index]['Last Name']}',
+                                                'Photo Url': friendList[index]
+                                                    ['Photo Url'],
+                                              });
+                                        },
+                                        child: CircleAvatar(
+                                          radius: 20.r,
+                                          backgroundColor: Color(0xff4D5151),
+                                          backgroundImage: (friendList[index]
+                                                          ['Photo Url'] ==
+                                                      null ||
+                                                  friendList[index]
+                                                          ['Photo Url'] ==
+                                                      '')
+                                              ? null
+                                              : NetworkImage(
+                                                  '${friendList[index]['Photo Url']}'),
+                                          child: (friendList[index]
+                                                          ['Photo Url'] ==
+                                                      null ||
+                                                  friendList[index]
+                                                          ['Photo Url'] ==
+                                                      '')
+                                              ? Icon(
+                                                  Icons.person,
+                                                  size: 27.sp,
+                                                )
+                                              : Container(),
+                                        ),
+                                        onLongPress: () {
+                                          deletefriend(index);
+                                        },
+                                      ),
+                                    ),
+                                    Container(
+                                      // width: 45.h,
+                                      child: Padding(
+                                        padding: REdgeInsets.only(top: 10),
+                                        child: Text(
+                                          '${friendList[index]['First Name']} ${friendList[index]['Last Name']}',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12.sp),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
+              SizedBox(
+                height: 13.h,
+              ),
+              Padding(
+                  padding: REdgeInsets.only(left: 20, right: 20),
+                  child: const Searchforcontents()),
+              SizedBox(
+                height: 13.h,
+              ),
+              Padding(
+                padding: REdgeInsets.only(left: 20, bottom: 15),
+                child: Text(
+                  "Your Message",
+                  style: MyThemeData.Addfriends,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
