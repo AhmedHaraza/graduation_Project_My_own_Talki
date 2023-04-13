@@ -97,14 +97,14 @@ class _MainChatScreenState extends State<MainChatScreen> {
                           margin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
                           child: Icon(
                             Icons.circle,
-                            color: snapshot.data!['Status'] == 'online'?Color(0xffFF4B26): Color.fromRGBO(95, 90, 90, 1.0),
+                            color: snapshot.hasData? snapshot.data!['Status'] == 'online'?Color(0xffFF4B26): Color.fromRGBO(95, 90, 90, 1.0): null,
                             size: 12,
                           ),
                         ),
                         Text(
                           snapshot.hasData?'${snapshot.data!['Status']}' :'',
                           style: TextStyle(
-                            color:  snapshot.data!['Status'] == 'online'?Color(0xffFF4B26): Color.fromRGBO(95, 90, 90, 1.0),
+                            color:  snapshot.hasData? snapshot.data!['Status'] == 'online'?Color(0xffFF4B26): Color.fromRGBO(95, 90, 90, 1.0):null,
                             fontSize: 14,
                           ),
                         ),
