@@ -73,42 +73,45 @@ class _MainChatScreenState extends State<MainChatScreen> {
             title: InkWell(
               onTap: () => userInfo(context),
               // ()=> userInfo(context),
-              child: Column(
-                children: [
-                  Container(
-                    constraints: BoxConstraints(),
-                    alignment: Alignment.centerLeft,
-                    child: FittedBox(
-                      child: Text(
-                        '${datauserInfo['First Name']} ${datauserInfo['Last Name']}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance.collection('users').doc('${datauserInfo['id']}'.trim()).snapshots(),
+                builder: (context, snapshot) =>  Column(
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(),
+                      alignment: Alignment.centerLeft,
+                      child: FittedBox(
+                        child: Text(
+                          '${datauserInfo['First Name']} ${datauserInfo['Last Name']}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-                        child: const Icon(
-                          Icons.circle,
-                          color: Color(0xffFF4B26),
-                          size: 12,
+                    Row(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                          child: Icon(
+                            Icons.circle,
+                            color: snapshot.data!['Status'] == 'online'?Color(0xffFF4B26): Color.fromRGBO(95, 90, 90, 1.0),
+                            size: 12,
+                          ),
                         ),
-                      ),
-                      const Text(
-                        'Online',
-                        style: TextStyle(
-                          color: Color(0xffFF4B26),
-                          fontSize: 14,
+                        Text(
+                          snapshot.hasData?'${snapshot.data!['Status']}' :'',
+                          style: TextStyle(
+                            color:  snapshot.data!['Status'] == 'online'?Color(0xffFF4B26): Color.fromRGBO(95, 90, 90, 1.0),
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             actions: appBarActions,
