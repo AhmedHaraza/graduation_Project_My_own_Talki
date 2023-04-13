@@ -23,15 +23,40 @@ class Home_Screen_Messenger extends StatefulWidget {
 
 bool isConnected = false;
 
-class _Home_Screen_MessengerState extends State<Home_Screen_Messenger> {
+class _Home_Screen_MessengerState extends State<Home_Screen_Messenger>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    setStatus('online');
     getAllFriends();
     InternetConnectionChecker().onStatusChange.listen((event) {
       setState(() {
         isConnected = event == InternetConnectionStatus.connected;
       });
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      //online
+      setStatus('online');
+    } else {
+      //offline
+      setStatus('offline');
+    }
+  }
+
+  void setStatus(String status) async {
+    var user = FirebaseAuth.instance.currentUser;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .update({
+      'Status': status,
     });
   }
 
