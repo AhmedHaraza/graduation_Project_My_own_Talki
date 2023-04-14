@@ -216,22 +216,26 @@ class _media_selectState extends State<media_select> {
     if (permission != PermissionStatus.granted) {
       await Permission.camera.request();
     } else {
-      var image = await ImagePicker().pickImage(source: ImageSource.camera);
-      _image = File(image!.path);
-      var user = FirebaseAuth.instance.currentUser;
-      var randomName = Random().nextInt(1000000000);
-      var ref = await FirebaseStorage.instance.ref();
-      var userImage = await ref
-          .child('users')
-          .child('messages')
-          .child('images/${randomName}${user?.displayName}');
-      await userImage.putFile(_image!);
-      String imageUrl = await userImage.getDownloadURL();
-      setState(() {
-        messagePhoto = imageUrl;
-      });
-      await sendMessageCamera();
-      Navigator.of(context, rootNavigator: true).pop('dialog');
+      try {
+        var image = await ImagePicker().pickImage(source: ImageSource.camera);
+        _image = File(image!.path);
+        var user = FirebaseAuth.instance.currentUser;
+        var randomName = Random().nextInt(1000000000);
+        var ref = await FirebaseStorage.instance.ref();
+        var userImage = await ref
+            .child('users')
+            .child('messages')
+            .child('images/${randomName}${user?.displayName}');
+        await userImage.putFile(_image!);
+        String imageUrl = await userImage.getDownloadURL();
+        setState(() {
+          messagePhoto = imageUrl;
+        });
+        await sendMessageCamera();
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
