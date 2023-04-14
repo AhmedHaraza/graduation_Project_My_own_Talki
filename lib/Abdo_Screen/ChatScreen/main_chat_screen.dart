@@ -147,6 +147,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
                               SenderMessage(
                                 messageContent:
                                     '${snapshot.data?.docs[index]['Message Content']}',
+                                    messageType: snapshot.data?.docs[index]['Type'],
                               ),
                               CircleAvatar(
                                 backgroundColor: Color(0xff4D5151),
@@ -186,6 +187,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
                               ReceiverMessage(
                                 messageContent:
                                     '${snapshot.data?.docs[index]['Message Content']}',
+                                    messageType: snapshot.data?.docs[index]['Type'],
                               ),
                             ],
                           )),

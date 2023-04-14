@@ -49,7 +49,7 @@ class ChatBox extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: ((context) =>
-                        media_select(MediaQuery.of(context).size.width)),
+                        media_select(MediaQuery.of(context).size.width,recieverId: recieverId,recieverName: recieverName,)),
                   );
                 },
                 icon: const Icon(
@@ -104,6 +104,7 @@ class ChatBox extends StatelessWidget {
       'Reciever Name': recieverName,
       'Message Content': messageController.text,
       'Date and Time' : DateTime.now(),
+      'Type': 'Text'
     });
 
     //save messages data for reciever
@@ -120,6 +121,7 @@ class ChatBox extends StatelessWidget {
       'Reciever Name': recieverName,
       'Message Content': messageController.text,
       'Date and Time' : DateTime.now(),
+      'Type': 'Text'
     });
 
     messageController.clear();

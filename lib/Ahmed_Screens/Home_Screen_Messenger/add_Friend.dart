@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/main_chat_screen.dart';
+import 'package:graduation_project_my_own_talki/Abdo_Screen/GroupChatScreen/main_group_chat_screen.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Home_Screen_Messenger/boutonnavigationbar.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Navigator.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/TextForm/Myform.dart';
@@ -20,6 +22,9 @@ class Addfrinds extends StatefulWidget {
 
 class _AddfrindsState extends State<Addfrinds> {
   var userList = [];
+  var userSearchList = [];
+  TextEditingController searchForPeopleController = TextEditingController();
+  bool isSearching = false;
 
   getAllUsers() async {
     var user = FirebaseAuth.instance.currentUser;
@@ -67,7 +72,29 @@ class _AddfrindsState extends State<Addfrinds> {
                   ),
                   Padding(
                     padding: REdgeInsets.only(left: 20, right: 20, bottom: 10),
-                    child: Container(height: 40.h, child: const Search()),
+                    child: Container(
+                        height: 40.h,
+                        child: Search(
+                          filledController: searchForPeopleController,
+                          onChanging: (value) {
+                            setState(() {
+                              isSearching = true;
+                              userSearchList.clear();
+                            });
+                            for (var i in userList) {
+                              if (i['First Name']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase())) {
+                                userSearchList.add(i);
+                              }
+                              ;
+                              setState(() {
+                                userSearchList;
+                              });
+                            }
+                          },
+                        )),
                   ),
                   SizedBox(
                     height: 10.h,
@@ -83,31 +110,77 @@ class _AddfrindsState extends State<Addfrinds> {
                     child: Container(
                       child: ListView.builder(
                         padding: REdgeInsets.all(0),
-                        itemCount: userList.length,
+                        itemCount: isSearching
+                            ? userSearchList.length
+                            : userList.length,
                         itemBuilder: (context, index) {
                           var user = FirebaseAuth.instance.currentUser;
                           if (user?.email != userList[index]['Email']) {
                             return ListTile(
-                              onTap: null,
+                              onTap: () async {
+                                Navigator.of(context).pushReplacementNamed(
+                                    MainChatScreen.route_MainChatScreen,
+                                    arguments: isSearching
+                                        ? {
+                                            'id':
+                                                '${userSearchList[index]['id']}',
+                                            'First Name':
+                                                '${userSearchList[index]['First Name']}',
+                                            'Last Name':
+                                                '${userSearchList[index]['Last Name']}',
+                                            'Photo Url': userSearchList[index]
+                                                ['Photo Url'],
+                                          }
+                                        : {
+                                            'id': '${userList[index]['id']}',
+                                            'First Name':
+                                                '${userList[index]['First Name']}',
+                                            'Last Name':
+                                                '${userList[index]['Last Name']}',
+                                            'Photo Url': userList[index]
+                                                ['Photo Url'],
+                                          });
+                              },
                               leading: CircleAvatar(
                                 radius: 25.r,
                                 backgroundColor: Color(0xff4D5151),
-                                backgroundImage:
-                                    (userList[index]['Photo Url'] == null ||
+                                backgroundImage: isSearching
+                                    ? (userSearchList[index]['Photo Url'] ==
+                                                null ||
+                                            userSearchList[index]
+                                                    ['Photo Url'] ==
+                                                '')
+                                        ? null
+                                        : NetworkImage(
+                                            '${userSearchList[index]['Photo Url']}')
+                                    : (userList[index]['Photo Url'] == null ||
                                             userList[index]['Photo Url'] == '')
                                         ? null
                                         : NetworkImage(
                                             '${userList[index]['Photo Url']}'),
-                                child: (userList[index]['Photo Url'] == null ||
-                                        userList[index]['Photo Url'] == '')
-                                    ? Icon(
-                                        Icons.person,
-                                        size: 30.sp,
-                                      )
-                                    : Container(),
+                                child: isSearching
+                                    ? (userSearchList[index]['Photo Url'] ==
+                                                null ||
+                                            userSearchList[index]
+                                                    ['Photo Url'] ==
+                                                '')
+                                        ? Icon(
+                                            Icons.person,
+                                            size: 30.sp,
+                                          )
+                                        : Container()
+                                    : (userList[index]['Photo Url'] == null ||
+                                            userList[index]['Photo Url'] == '')
+                                        ? Icon(
+                                            Icons.person,
+                                            size: 30.sp,
+                                          )
+                                        : Container(),
                               ),
                               title: Text(
-                                '${userList[index]['First Name']} ${userList[index]['Last Name']}',
+                                isSearching
+                                    ? '${userSearchList[index]['First Name']} ${userSearchList[index]['Last Name']}'
+                                    : '${userList[index]['First Name']} ${userList[index]['Last Name']}',
                                 style: TextStyle(
                                   color: Colors.white,
                                 ),
@@ -122,13 +195,12 @@ class _AddfrindsState extends State<Addfrinds> {
                                 onTap: () async {
                                   await addFriend(index);
                                   final snackBar = SnackBar(
-                                    backgroundColor: Color(0xff1C1C1C),
+                                      backgroundColor: Color(0xff1C1C1C),
                                       content: Text(
                                         'Friend has been successfully added',
                                         style: TextStyle(
-                                          fontSize: 15.sp,
-                                          fontWeight: FontWeight.bold
-                                        ),
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold),
                                         textAlign: TextAlign.center,
                                       ),
                                       duration: Duration(seconds: 2));

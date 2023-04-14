@@ -1,6 +1,8 @@
 // ignore_for_file: unnecessary_string_interpolations, sized_box_for_whitespace, use_key_in_widget_constructors, non_constant_identifier_names, must_be_immutable, file_names, camel_case_types
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:graduation_project_my_own_talki/Abdo_Screen/GroupChatScreen/main_group_chat_screen.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/my_theme.dart';
 
 class MyForme extends StatelessWidget {
@@ -210,12 +212,17 @@ class SearchforGroup extends StatelessWidget {
 }
 
 class Search extends StatelessWidget {
-  const Search({Key? key}) : super(key: key);
+  Search({Key? key,required this.filledController,this.onChanging}) : super(key: key);
+
+  TextEditingController filledController = TextEditingController();
+  void Function(String)? onChanging;
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 40.h,
       child: TextFormField(
+        onChanged: onChanging,
+        controller: filledController,
         style: TextStyle(
           color: const Color.fromRGBO(255, 75, 38, 1.0),
           fontSize: 12.sp,

@@ -1,15 +1,20 @@
 import 'dart:io';
+import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/contacts_list.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class media_select extends StatefulWidget {
-  media_select(this.screenwidth);
+  media_select(this.screenwidth, {this.recieverId, this.recieverName});
   var screenwidth;
-  File? _image;
+  var recieverId;
+  var recieverName;
   @override
   State<media_select> createState() => _media_selectState();
 }
@@ -17,6 +22,14 @@ class media_select extends StatefulWidget {
 class _media_selectState extends State<media_select> {
   File? _image;
   String fileText = "";
+  var messagePhoto;
+
+  FilePickerResult? result;
+  String? _fileName;
+  PlatformFile? pickedfile;
+  bool isLoading = false;
+  File? fileToDisplay;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -98,14 +111,42 @@ class _media_selectState extends State<media_select> {
                 ),
                 child: IconButton(
                   onPressed: () async {
-                     final permission = await Permission.photos.status;
+                    final permission = await Permission.photos.status;
                     if (permission != PermissionStatus.granted) {
                       await Permission.photos.request();
                     }
-                    final result = await FilePicker.platform.pickFiles(
-                      allowMultiple: true,
-                      type: FileType.image,
-                    );
+                    try {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      result = await FilePicker.platform.pickFiles(
+                          type: FileType.image, allowMultiple: false);
+                      if (result != null) {
+                        _fileName = result!.files.first.name;
+                        pickedfile = result!.files.first;
+                        _image = File(pickedfile!.path.toString());
+                        var user = FirebaseAuth.instance.currentUser;
+                        var randomName = Random().nextInt(1000000000);
+                        var ref = await FirebaseStorage.instance.ref();
+                        var userImage = await ref
+                            .child('users')
+                            .child('messages')
+                            .child('images/${randomName}${user?.displayName}');
+                        await userImage.putFile(_image!);
+                        String imageUrl = await userImage.getDownloadURL();
+                        setState(() {
+                          messagePhoto = imageUrl;
+                        });
+                        await sendMessage();
+                        Navigator.of(context, rootNavigator: true)
+                            .pop('dialog');
+                      }
+                      setState(() {
+                        isLoading = false;
+                      });
+                    } catch (e) {
+                      print(e);
+                    }
                     if (result == null) return;
                   },
                   icon: const Icon(
@@ -174,30 +215,31 @@ class _media_selectState extends State<media_select> {
     final permission = await Permission.camera.status;
     if (permission != PermissionStatus.granted) {
       await Permission.camera.request();
-    }
-    else{
-       var image = await ImagePicker().pickImage(source: ImageSource.camera);
-    _image = File(image!.path);
-    Navigator.of(context, rootNavigator: true).pop('dialog');
-    }
-  }
-
-  void pickGalaey() async {
-    final permission = await Permission.photos.status;
-    if (permission != PermissionStatus.granted) {
-      await Permission.photos.request();
     } else {
-      var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      var image = await ImagePicker().pickImage(source: ImageSource.camera);
       _image = File(image!.path);
+      var user = FirebaseAuth.instance.currentUser;
+      var randomName = Random().nextInt(1000000000);
+      var ref = await FirebaseStorage.instance.ref();
+      var userImage = await ref
+          .child('users')
+          .child('messages')
+          .child('images/${randomName}${user?.displayName}');
+      await userImage.putFile(_image!);
+      String imageUrl = await userImage.getDownloadURL();
+      setState(() {
+        messagePhoto = imageUrl;
+      });
+      await sendMessageCamera();
       Navigator.of(context, rootNavigator: true).pop('dialog');
     }
   }
 
   void OpenFile() async {
-     final permission = await Permission.manageExternalStorage.status;
-                    if (permission != PermissionStatus.granted) {
-                      await Permission.manageExternalStorage.request();
-                    }
+    final permission = await Permission.manageExternalStorage.status;
+    if (permission != PermissionStatus.granted) {
+      await Permission.manageExternalStorage.request();
+    }
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'pdf', 'doc'],
@@ -213,5 +255,79 @@ class _media_selectState extends State<media_select> {
       File _file = File(result.files.single.path!);
       fileText = _file.path;
     }
+  }
+
+  sendMessage() async {
+    var currentUser = await FirebaseAuth.instance.currentUser;
+    //save messages data for sender
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser?.uid)
+        .collection('Chats')
+        .doc(widget.recieverId.toString().trim())
+        .collection('Messages')
+        .add({
+      'Sender ID': currentUser?.uid,
+      'Reciever ID': widget.recieverId,
+      'Sender Name': currentUser?.displayName,
+      'Reciever Name': widget.recieverName,
+      'Message Content': messagePhoto,
+      'Date and Time': DateTime.now(),
+      'Type': 'Photo'
+    });
+
+    //save messages data for reciever
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.recieverId.toString().trim())
+        .collection('Chats')
+        .doc(currentUser?.uid)
+        .collection('Messages')
+        .add({
+      'Sender ID': currentUser?.uid,
+      'Reciever ID': widget.recieverId,
+      'Sender Name': currentUser?.displayName,
+      'Reciever Name': widget.recieverName,
+      'Message Content': messagePhoto,
+      'Date and Time': DateTime.now(),
+      'Type': 'Photo'
+    });
+  }
+
+  sendMessageCamera() async {
+    var currentUser = await FirebaseAuth.instance.currentUser;
+    //save messages data for sender
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser?.uid)
+        .collection('Chats')
+        .doc(widget.recieverId.toString().trim())
+        .collection('Messages')
+        .add({
+      'Sender ID': currentUser?.uid,
+      'Reciever ID': widget.recieverId,
+      'Sender Name': currentUser?.displayName,
+      'Reciever Name': widget.recieverName,
+      'Message Content': messagePhoto,
+      'Date and Time': DateTime.now(),
+      'Type': 'Photo'
+    });
+
+    //save messages data for reciever
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.recieverId.toString().trim())
+        .collection('Chats')
+        .doc(currentUser?.uid)
+        .collection('Messages')
+        .add({
+      'Sender ID': currentUser?.uid,
+      'Reciever ID': widget.recieverId,
+      'Sender Name': currentUser?.displayName,
+      'Reciever Name': widget.recieverName,
+      'Message Content': messagePhoto,
+      'Date and Time': DateTime.now(),
+      'Type': 'Photo'
+    });
   }
 }

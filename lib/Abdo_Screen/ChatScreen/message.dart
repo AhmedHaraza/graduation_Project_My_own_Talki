@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SenderMessage extends StatelessWidget {
-  SenderMessage({super.key,this.messageContent});
+  SenderMessage({super.key,this.messageContent,this.messageType});
 
   var messageContent;
+  var messageType;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xffFF4B26),
+        color:(messageType == 'Photo')? Colors.transparent: Color(0xffFF4B26),
         borderRadius: BorderRadiusDirectional.only(
           topStart: Radius.circular(10.r),
           bottomStart: Radius.circular(10.r),
@@ -19,16 +20,17 @@ class SenderMessage extends StatelessWidget {
       ),
       margin: REdgeInsets.all(10),
       padding: REdgeInsets.all(10),
-      child: Text(messageContent,style: TextStyle(color: Colors.white),),
+      child: (messageType == 'Photo')? Image.network('${messageContent.toString().trim()}',width: 150.w,height: 150.h,fit:BoxFit.cover ,):Text(messageContent.toString(),style: TextStyle(color: Colors.white),),
     );
   }
 }
 
 
 class ReceiverMessage extends StatelessWidget {
-  ReceiverMessage({super.key,this.messageContent});
+  ReceiverMessage({super.key,this.messageContent,this.messageType});
 
   var messageContent;
+  var messageType;
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +40,14 @@ class ReceiverMessage extends StatelessWidget {
         margin: REdgeInsets.all(10),
         padding: REdgeInsets.all(10),
         decoration: BoxDecoration(
-        color: Colors.black,
+        color:(messageType == 'Photo')? Colors.transparent :Colors.black,
         borderRadius: BorderRadiusDirectional.only(
           topEnd: Radius.circular(10.r),
           bottomStart: Radius.circular(10.r),
           bottomEnd: Radius.circular(10.r),
         ),
       ),
-        child: Text(messageContent,style: TextStyle(color: Colors.white),),
+        child: (messageType == 'Photo')? Image.network('${messageContent.toString().trim()}',width: 150.w,height: 150.h,):Text(messageContent,style: TextStyle(color: Colors.white),),
       ),
     );
   }
