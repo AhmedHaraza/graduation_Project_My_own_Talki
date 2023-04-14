@@ -193,7 +193,7 @@ class _AddfrindsState extends State<Addfrinds> {
                               ),
                               trailing: InkWell(
                                 onTap: () async {
-                                  await addFriend(index);
+                                  await isSearching? addSearchedFriend(index): addFriend(index);
                                   final snackBar = SnackBar(
                                       backgroundColor: Color(0xff1C1C1C),
                                       content: Text(
@@ -246,6 +246,21 @@ class _AddfrindsState extends State<Addfrinds> {
       'Last Name': '${userList[Index]['Last Name']}',
       'Email': '${userList[Index]['Email']}',
       'Photo Url': userList[Index]['Photo Url'],
+    });
+  }
+  addSearchedFriend(Index) async {
+    var user = await FirebaseAuth.instance.currentUser;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .collection('Friends')
+        .doc('${userSearchList[Index]['id']}')
+        .set({
+      'id': '${userSearchList[Index]['id']}',
+      'First Name': '${userSearchList[Index]['First Name']}',
+      'Last Name': '${userSearchList[Index]['Last Name']}',
+      'Email': '${userSearchList[Index]['Email']}',
+      'Photo Url': userSearchList[Index]['Photo Url'],
     });
   }
 }
