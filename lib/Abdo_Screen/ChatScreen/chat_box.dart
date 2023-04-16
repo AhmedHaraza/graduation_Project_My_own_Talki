@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 import 'media_select.dart';
 
 class ChatBox extends StatelessWidget {
-  ChatBox({super.key, this.recieverId, this.recieverName});
+  ChatBox({super.key, this.recieverId, this.recieverName,this.recieverPhoto});
 
   TextEditingController messageController = new TextEditingController();
   var recieverId;
   var recieverName;
+  var recieverPhoto;
   @override
   Widget build(BuildContext context) {
     return TextField(
@@ -49,7 +50,7 @@ class ChatBox extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: ((context) =>
-                        media_select(MediaQuery.of(context).size.width,recieverId: recieverId,recieverName: recieverName,)),
+                        media_select(MediaQuery.of(context).size.width,recieverId: recieverId,recieverName: recieverName,recieverPhoto: recieverPhoto,)),
                   );
                 },
                 icon: const Icon(
@@ -89,6 +90,7 @@ class ChatBox extends StatelessWidget {
   }
 
   sendMessage() async {
+    if(messageController.text == '' || messageController.text == null) return;
     var currentUser = await FirebaseAuth.instance.currentUser;
     //save messages data for sender
     await FirebaseFirestore.instance
@@ -99,12 +101,13 @@ class ChatBox extends StatelessWidget {
         .collection('Messages')
         .add({
       'Sender ID': currentUser?.uid,
-      'Reciever ID': recieverId,
+      'Reciever ID': recieverId.toString(),
       'Sender Name': currentUser?.displayName,
       'Reciever Name': recieverName,
       'Message Content': messageController.text,
       'Date and Time' : DateTime.now(),
-      'Type': 'Text'
+      'Reciever Photo' : recieverPhoto,
+      'Type':  messageController.text.contains('http') ||messageController.text.contains('https')? 'Link': 'Text'
     });
 
     //save messages data for reciever
@@ -121,9 +124,10 @@ class ChatBox extends StatelessWidget {
       'Reciever Name': recieverName,
       'Message Content': messageController.text,
       'Date and Time' : DateTime.now(),
-      'Type': 'Text'
+      'Reciever Photo' : recieverPhoto,
+      'Type': messageController.text.contains('http') ||messageController.text.contains('https')? 'Link': 'Text'
     });
-
+    
     messageController.clear();
   }
 }

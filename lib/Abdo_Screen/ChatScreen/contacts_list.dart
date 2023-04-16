@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
-import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/main_chat_screen.dart';
 import 'package:intl/intl.dart';
 
 class ContactListPage extends StatefulWidget {

@@ -5,9 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/message.dart';
+import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/popup_menue.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Navigator.dart';
+import 'package:graduation_project_my_own_talki/Nada_Screens/User_Info.dart';
 
-import 'app_bar_content.dart';
 import 'chat_box.dart';
 
 class MainChatScreen extends StatefulWidget {
@@ -36,6 +37,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
     getUserInfo();
   }
 
+
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> datauserInfo =
@@ -52,7 +54,15 @@ class _MainChatScreenState extends State<MainChatScreen> {
             leading: Container(
               margin: const EdgeInsets.all(7),
               child: InkWell(
-                onTap: () => userInfo(context),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                    return User_Info(
+                      recieverPhoto: datauserInfo['Photo Url'],
+                      recieverName: '${datauserInfo['First Name']} ${datauserInfo['Last Name']}',
+                      recieverId: '${datauserInfo['id']}'.trim(),
+                    );
+                  }));
+                },
                 child: CircleAvatar(
                   radius: 25.r,
                   backgroundColor: Color(0xff4D5151),
@@ -71,11 +81,22 @@ class _MainChatScreenState extends State<MainChatScreen> {
               ),
             ),
             title: InkWell(
-              onTap: () => userInfo(context),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                    return User_Info(
+                      recieverPhoto: datauserInfo['Photo Url'],
+                      recieverName: '${datauserInfo['First Name']} ${datauserInfo['Last Name']}',
+                      recieverId: '${datauserInfo['id']}'.trim(),
+                    );
+                  }));
+              },
               // ()=> userInfo(context),
               child: StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('users').doc('${datauserInfo['id']}'.trim()).snapshots(),
-                builder: (context, snapshot) =>  Column(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc('${datauserInfo['id']}'.trim())
+                    .snapshots(),
+                builder: (context, snapshot) => Column(
                   children: [
                     Container(
                       constraints: BoxConstraints(),
@@ -97,14 +118,22 @@ class _MainChatScreenState extends State<MainChatScreen> {
                           margin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
                           child: Icon(
                             Icons.circle,
-                            color: snapshot.hasData? snapshot.data!['Status'] == 'online'?Color(0xffFF4B26): Color.fromRGBO(95, 90, 90, 1.0): null,
+                            color: snapshot.hasData
+                                ? snapshot.data!['Status'] == 'online'
+                                    ? Color(0xffFF4B26)
+                                    : Color.fromRGBO(95, 90, 90, 1.0)
+                                : null,
                             size: 12,
                           ),
                         ),
                         Text(
-                          snapshot.hasData?'${snapshot.data!['Status']}' :'',
+                          snapshot.hasData ? '${snapshot.data!['Status']}' : '',
                           style: TextStyle(
-                            color:  snapshot.hasData? snapshot.data!['Status'] == 'online'?Color(0xffFF4B26): Color.fromRGBO(95, 90, 90, 1.0):null,
+                            color: snapshot.hasData
+                                ? snapshot.data!['Status'] == 'online'
+                                    ? Color(0xffFF4B26)
+                                    : Color.fromRGBO(95, 90, 90, 1.0)
+                                : null,
                             fontSize: 14,
                           ),
                         ),
@@ -114,7 +143,34 @@ class _MainChatScreenState extends State<MainChatScreen> {
                 ),
               ),
             ),
-            actions: appBarActions,
+            actions: [
+              IconButton(
+                constraints: const BoxConstraints(),
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.videocam_outlined,
+                  color: Color(0xFFFF4B26),
+                  size: 34,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 10),
+                child: IconButton(
+                  constraints: const BoxConstraints(),
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.add_call,
+                    color: Color(0xFFFF4B26),
+                    size: 25,
+                  ),
+                ),
+              ),
+              Container(
+                  constraints: const BoxConstraints(),
+                  child: PopUpMenu(
+                    recieverId: datauserInfo['id'].toString().trim(),
+                  )),
+            ],
             backgroundColor: const Color(0xff1C1C1C),
           ),
           body: StreamBuilder(
@@ -147,7 +203,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
                               SenderMessage(
                                 messageContent:
                                     '${snapshot.data?.docs[index]['Message Content']}',
-                                    messageType: snapshot.data?.docs[index]['Type'],
+                                messageType: snapshot.data?.docs[index]['Type'],
                               ),
                               CircleAvatar(
                                 backgroundColor: Color(0xff4D5151),
@@ -187,7 +243,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
                               ReceiverMessage(
                                 messageContent:
                                     '${snapshot.data?.docs[index]['Message Content']}',
-                                    messageType: snapshot.data?.docs[index]['Type'],
+                                messageType: snapshot.data?.docs[index]['Type'],
                               ),
                             ],
                           )),
@@ -204,6 +260,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
                 recieverId: datauserInfo['id'],
                 recieverName:
                     '${datauserInfo['First Name']} ${datauserInfo['Last Name']}',
+                    recieverPhoto: '${datauserInfo['Photo Url']}',
               ),
             ),
           ),

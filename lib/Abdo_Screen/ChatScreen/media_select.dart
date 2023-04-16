@@ -11,10 +11,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class media_select extends StatefulWidget {
-  media_select(this.screenwidth, {this.recieverId, this.recieverName});
+  media_select(this.screenwidth, {this.recieverId, this.recieverName,this.recieverPhoto});
   var screenwidth;
   var recieverId;
   var recieverName;
+  var recieverPhoto;
   @override
   State<media_select> createState() => _media_selectState();
 }
@@ -277,6 +278,7 @@ class _media_selectState extends State<media_select> {
       'Reciever Name': widget.recieverName,
       'Message Content': messagePhoto,
       'Date and Time': DateTime.now(),
+      'Reciever Photo' : widget.recieverPhoto,
       'Type': 'Photo'
     });
 
@@ -294,6 +296,7 @@ class _media_selectState extends State<media_select> {
       'Reciever Name': widget.recieverName,
       'Message Content': messagePhoto,
       'Date and Time': DateTime.now(),
+      'Reciever Photo' : widget.recieverPhoto,
       'Type': 'Photo'
     });
   }
@@ -314,6 +317,7 @@ class _media_selectState extends State<media_select> {
       'Reciever Name': widget.recieverName,
       'Message Content': messagePhoto,
       'Date and Time': DateTime.now(),
+      'Reciever Photo' : widget.recieverPhoto,
       'Type': 'Photo'
     });
 
@@ -331,6 +335,7 @@ class _media_selectState extends State<media_select> {
       'Reciever Name': widget.recieverName,
       'Message Content': messagePhoto,
       'Date and Time': DateTime.now(),
+      'Reciever Photo' : widget.recieverPhoto,
       'Type': 'Photo'
     });
   }

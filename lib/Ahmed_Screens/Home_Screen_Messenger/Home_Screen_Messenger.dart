@@ -52,10 +52,7 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger>
 
   void setStatus(String status) async {
     var user = FirebaseAuth.instance.currentUser;
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user?.uid)
-        .update({
+    await FirebaseFirestore.instance.collection('users').doc(user?.uid).update({
       'Status': status,
     });
   }
@@ -222,6 +219,54 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger>
                 child: Text(
                   "Your Message",
                   style: MyThemeData.Addfriends,
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  child: ListView.builder(
+                    itemCount: friendList.length,
+                    itemBuilder: ((context, index) => ListTile(
+                          onTap: () async {
+                            Navigator.of(context).pushReplacementNamed(
+                                MainChatScreen.route_MainChatScreen,
+                                arguments: {
+                                  'id': '${friendList[index]['id']}',
+                                  'First Name':
+                                      '${friendList[index]['First Name']}',
+                                  'Last Name':
+                                      '${friendList[index]['Last Name']}',
+                                  'Photo Url': friendList[index]['Photo Url'],
+                                });
+                          },
+                          leading: CircleAvatar(
+                            radius: 20.r,
+                            backgroundColor: Color(0xff4D5151),
+                            backgroundImage:
+                                (friendList[index]['Photo Url'] == null ||
+                                        friendList[index]['Photo Url'] == '')
+                                    ? null
+                                    : NetworkImage(
+                                        '${friendList[index]['Photo Url']}'),
+                            child: (friendList[index]['Photo Url'] == null ||
+                                    friendList[index]['Photo Url'] == '')
+                                ? Icon(
+                                    Icons.person,
+                                    size: 27.sp,
+                                  )
+                                : Container(),
+                          ),
+                          title: Text(
+                            '${friendList[index]['First Name']} ${friendList[index]['Last Name']}',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          trailing: Icon(
+                            Icons.chat,
+                            color: Color.fromRGBO(255, 75, 38, 1.0),
+                          ),
+                        )),
+                  ),
                 ),
               ),
             ],
