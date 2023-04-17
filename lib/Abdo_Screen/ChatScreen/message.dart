@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:path/path.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SenderMessage extends StatelessWidget {
-  SenderMessage({super.key, this.messageContent, this.messageType});
+  SenderMessage(
+      {super.key, this.messageContent, this.messageType, this.contactName});
 
   var messageContent;
   var messageType;
+  var contactName;
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +40,52 @@ class SenderMessage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 8.sp,
                   ),
-                  linkStyle: TextStyle(
-                    color: Colors.white
-                  ),
+                  linkStyle: TextStyle(color: Colors.white),
                 )
-              : Text(
-                  messageContent,
-                  style: TextStyle(color: Colors.white),
-                ),
+              : (messageType == 'Contact')
+                  ? Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 20.r,
+                          backgroundColor: Color(0xff4D5151),
+                          child: Icon(
+                            Icons.person,
+                            size: 25.sp,
+                          ),
+                        ),
+                        Padding(
+                          padding: REdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: REdgeInsets.only(bottom: 3),
+                                child: Text(
+                                  contactName,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () => launchUrl(
+                                    Uri(scheme: 'tel', path: messageContent)),
+                                child: Text(
+                                  messageContent,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    )
+                  : Text(
+                      messageContent,
+                      style: TextStyle(color: Colors.white),
+                    ),
     );
   }
 
@@ -60,10 +98,12 @@ class SenderMessage extends StatelessWidget {
 }
 
 class ReceiverMessage extends StatelessWidget {
-  ReceiverMessage({super.key, this.messageContent, this.messageType});
+  ReceiverMessage(
+      {super.key, this.messageContent, this.messageType, this.contactName});
 
   var messageContent;
   var messageType;
+  var contactName;
 
   @override
   Widget build(BuildContext context) {
@@ -89,25 +129,63 @@ class ReceiverMessage extends StatelessWidget {
               )
             : (messageType == 'Link')
                 ? Linkify(
-                  text: messageContent,
-                  onOpen: _onOpen,
-                  textScaleFactor: 2,
-                  style: TextStyle(
-                    fontSize: 8.sp,
-                  ),
-                  linkStyle: TextStyle(
-                    color: Colors.white
-                  ),
-                )
-                : Text(
-                    messageContent,
-                    style: TextStyle(color: Colors.white),
-                  ),
+                    text: messageContent,
+                    onOpen: _onOpen,
+                    textScaleFactor: 2,
+                    style: TextStyle(
+                      fontSize: 8.sp,
+                    ),
+                    linkStyle: TextStyle(color: Colors.white),
+                  )
+                : (messageType == 'Contact')
+                    ? Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20.r,
+                            backgroundColor: Color(0xff4D5151),
+                            child: Icon(
+                              Icons.person,
+                              size: 25.sp,
+                            ),
+                          ),
+                          Padding(
+                            padding: REdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Padding(
+                                  padding: REdgeInsets.only(bottom: 3),
+                                  child: Text(
+                                    contactName,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () => launchUrl(
+                                      Uri(scheme: 'tel', path: messageContent)),
+                                  child: Text(
+                                    messageContent,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      )
+                    : Text(
+                        messageContent,
+                        style: TextStyle(color: Colors.white),
+                      ),
       ),
     );
   }
 
-    Future<void> _onOpen(LinkableElement link) async {
+  Future<void> _onOpen(LinkableElement link) async {
     final url = Uri.parse(messageContent);
     if (await canLaunchUrl(url)) {
       await launchUrl(url);

@@ -9,7 +9,8 @@ import 'package:graduation_project_my_own_talki/Ahmed_Screens/my_theme.dart';
 
 class contectsmessegegroup extends StatelessWidget {
   static const String route_contectsmessegegroup = 'contectsmessegegroup';
-  const contectsmessegegroup({Key? key}) : super(key: key);
+  contectsmessegegroup({Key? key}) : super(key: key);
+  var messageGroupController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -38,7 +39,9 @@ class contectsmessegegroup extends StatelessWidget {
                   padding: REdgeInsets.only(left: 20, right: 20),
                   child: Container(
                       margin: REdgeInsets.only(right: 20),
-                      child: const Searchforcontents()),
+                      child: Searchforcontents(
+                        filledController: messageGroupController,
+                      )),
                 ),
                 SizedBox(height: 10.h),
                 Padding(

@@ -135,12 +135,16 @@ class Myform2 extends StatelessWidget {
 }
 
 class Searchforcontents extends StatelessWidget {
-  const Searchforcontents({Key? key}) : super(key: key);
+  Searchforcontents({Key? key,required this.filledController,this.onChanging}) : super(key: key);
+  TextEditingController filledController = TextEditingController();
+  void Function(String)? onChanging;
   @override
   Widget build(BuildContext context) {
     return Container(
         height: 40.h,
         child: TextFormField(
+          controller: filledController,
+          onChanged: onChanging,
           style: TextStyle(
             color: const Color.fromRGBO(255, 75, 38, 1.0),
             fontSize: 12.sp,
@@ -155,7 +159,7 @@ class Searchforcontents extends StatelessWidget {
               ),
               filled: true,
               fillColor: Colors.white,
-              hintText: "Search for contacts",
+              hintText: "Search for Chats",
               hintStyle: const TextStyle(
                 color: Color.fromRGBO(255, 75, 38, 1.0),
                 fontWeight: FontWeight.w800,

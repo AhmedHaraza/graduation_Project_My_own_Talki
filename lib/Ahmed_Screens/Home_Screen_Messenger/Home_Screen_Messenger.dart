@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/ChatScreen/main_chat_screen.dart';
+import 'package:graduation_project_my_own_talki/Abdo_Screen/GroupChatScreen/main_group_chat_screen.dart';
 import 'package:graduation_project_my_own_talki/Abdo_Screen/SideMenu/side_menu.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/CircleAvatar/CircleAvatar_add.dart';
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/Home_Screen_Messenger/boutonnavigationbar.dart';
@@ -25,6 +26,9 @@ bool isConnected = false;
 
 class _Home_Screen_MessengerState extends State<Home_Screen_Messenger>
     with WidgetsBindingObserver {
+
+      bool isSearching = false;
+      var friendSearchList = [];
   @override
   void initState() {
     super.initState();
@@ -56,6 +60,8 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger>
       'Status': status,
     });
   }
+  
+  var searchForChatsController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +216,27 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger>
               ),
               Padding(
                   padding: REdgeInsets.only(left: 20, right: 20),
-                  child: const Searchforcontents()),
+                  child: Searchforcontents(
+                    filledController: searchForChatsController,
+                    onChanging: (value) {
+                            setState(() {
+                              isSearching = true;
+                              friendSearchList.clear();
+                            });
+                            for (var i in friendList) {
+                              if (i['First Name']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase())) {
+                                friendSearchList.add(i);
+                              }
+                              ;
+                              setState(() {
+                                friendSearchList;
+                              });
+                            }
+                          },
+                  )),
               SizedBox(
                 height: 13.h,
               ),
@@ -224,43 +250,84 @@ class _Home_Screen_MessengerState extends State<Home_Screen_Messenger>
               Expanded(
                 child: Container(
                   child: ListView.builder(
-                    itemCount: friendList.length,
+                    itemCount: isSearching
+                            ? friendSearchList.length
+                            : friendList.length,
                     itemBuilder: ((context, index) => ListTile(
                           onTap: () async {
                             Navigator.of(context).pushReplacementNamed(
-                                MainChatScreen.route_MainChatScreen,
-                                arguments: {
-                                  'id': '${friendList[index]['id']}',
-                                  'First Name':
-                                      '${friendList[index]['First Name']}',
-                                  'Last Name':
-                                      '${friendList[index]['Last Name']}',
-                                  'Photo Url': friendList[index]['Photo Url'],
-                                });
+                                    MainChatScreen.route_MainChatScreen,
+                                    arguments: isSearching
+                                        ? {
+                                            'id':
+                                                '${friendSearchList[index]['id']}',
+                                            'First Name':
+                                                '${friendSearchList[index]['First Name']}',
+                                            'Last Name':
+                                                '${friendSearchList[index]['Last Name']}',
+                                            'Photo Url': friendSearchList[index]
+                                                ['Photo Url'],
+                                          }
+                                        : {
+                                            'id': '${friendList[index]['id']}',
+                                            'First Name':
+                                                '${friendList[index]['First Name']}',
+                                            'Last Name':
+                                                '${friendList[index]['Last Name']}',
+                                            'Photo Url': friendList[index]
+                                                ['Photo Url'],
+                                          });
                           },
                           leading: CircleAvatar(
-                            radius: 20.r,
-                            backgroundColor: Color(0xff4D5151),
-                            backgroundImage:
-                                (friendList[index]['Photo Url'] == null ||
-                                        friendList[index]['Photo Url'] == '')
-                                    ? null
-                                    : NetworkImage(
-                                        '${friendList[index]['Photo Url']}'),
-                            child: (friendList[index]['Photo Url'] == null ||
-                                    friendList[index]['Photo Url'] == '')
-                                ? Icon(
-                                    Icons.person,
-                                    size: 27.sp,
-                                  )
-                                : Container(),
-                          ),
-                          title: Text(
-                            '${friendList[index]['First Name']} ${friendList[index]['Last Name']}',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
+                                radius: 25.r,
+                                backgroundColor: Color(0xff4D5151),
+                                backgroundImage: isSearching
+                                    ? (friendSearchList[index]['Photo Url'] ==
+                                                null ||
+                                            friendSearchList[index]
+                                                    ['Photo Url'] ==
+                                                '')
+                                        ? null
+                                        : NetworkImage(
+                                            '${friendSearchList[index]['Photo Url']}')
+                                    : (friendList[index]['Photo Url'] == null ||
+                                            friendList[index]['Photo Url'] == '')
+                                        ? null
+                                        : NetworkImage(
+                                            '${friendList[index]['Photo Url']}'),
+                                child: isSearching
+                                    ? (friendSearchList[index]['Photo Url'] ==
+                                                null ||
+                                            friendSearchList[index]
+                                                    ['Photo Url'] ==
+                                                '')
+                                        ? Icon(
+                                            Icons.person,
+                                            size: 30.sp,
+                                          )
+                                        : Container()
+                                    : (friendList[index]['Photo Url'] == null ||
+                                            friendList[index]['Photo Url'] == '')
+                                        ? Icon(
+                                            Icons.person,
+                                            size: 30.sp,
+                                          )
+                                        : Container(),
+                              ),
+                          title:Text(
+                                isSearching
+                                    ? '${friendSearchList[index]['First Name']} ${friendSearchList[index]['Last Name']}'
+                                    : '${friendList[index]['First Name']} ${friendList[index]['Last Name']}',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Hello there!',
+                                style: TextStyle(
+                                    color:
+                                        const Color.fromRGBO(255, 75, 38, 1.0)),
+                              ),
                           trailing: Icon(
                             Icons.chat,
                             color: Color.fromRGBO(255, 75, 38, 1.0),

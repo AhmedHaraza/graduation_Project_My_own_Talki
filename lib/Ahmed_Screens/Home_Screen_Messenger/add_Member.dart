@@ -5,8 +5,9 @@ import 'package:graduation_project_my_own_talki/Ahmed_Screens/TextForm/Myform.da
 import 'package:graduation_project_my_own_talki/Ahmed_Screens/my_theme.dart';
 
 class Add_Members extends StatelessWidget {
-  const Add_Members({Key? key}) : super(key: key);
+  Add_Members({Key? key}) : super(key: key);
   static const String route_Add_Members = 'rout_Add_Members';
+  var addMemberController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -28,7 +29,9 @@ class Add_Members extends StatelessWidget {
               SizedBox(
                 height: 30.h,
               ),
-              Container(width: 500.w, child: const Searchforcontents()),
+              Container(width: 500.w, child:  Searchforcontents(
+                filledController: addMemberController,
+              )),
               SizedBox(
                 height: 15.h,
               ),

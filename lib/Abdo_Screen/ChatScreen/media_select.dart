@@ -195,7 +195,11 @@ class _media_selectState extends State<media_select> {
                       await Permission.contacts.request();
                     } else {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ContactListPage()));
+                          builder: (context) => ContactListPage(
+                            recieverId: widget.recieverId,
+                            recieverName: widget.recieverName,
+                            recieverPhoto: widget.recieverPhoto,
+                          )));
                     }
                   },
                   icon: const Icon(

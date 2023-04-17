@@ -204,6 +204,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
                                 messageContent:
                                     '${snapshot.data?.docs[index]['Message Content']}',
                                 messageType: snapshot.data?.docs[index]['Type'],
+                                contactName: snapshot.data?.docs[index]['Type'] == 'Contact'? snapshot.data?.docs[index]['Contact Name']: null,
                               ),
                               CircleAvatar(
                                 backgroundColor: Color(0xff4D5151),
@@ -244,6 +245,7 @@ class _MainChatScreenState extends State<MainChatScreen> {
                                 messageContent:
                                     '${snapshot.data?.docs[index]['Message Content']}',
                                 messageType: snapshot.data?.docs[index]['Type'],
+                                contactName: snapshot.data?.docs[index]['Type'] == 'Contact'? snapshot.data?.docs[index]['Contact Name']: null,
                               ),
                             ],
                           )),
